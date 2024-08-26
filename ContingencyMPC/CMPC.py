@@ -66,13 +66,13 @@ def solve_Cmpc(x0, y0n, y0c, t):
     yn[0] = y0n
     yc[0] = y0c
 
-    # State update equations
+    # State update equations  initial states ?
     for k in range(N):
         x[k+1] = x[k] + 1
         yn[k+1] = yn[k] + un[k]
         yc[k+1] = yc[k] + uc[k]
 
-    # Define the cost function
+    # Define the cost function,
     J = 0
     for k in range(N):             
         J += Pn * un[k]**2 + Pc * uc[k]**2
@@ -82,8 +82,8 @@ def solve_Cmpc(x0, y0n, y0c, t):
     lbg = []
     ubg = []
 
-    # Control constraint
-    g.append(un[0] - uc[0])
+    # Control constraint , branch point for contingency, TODO got it by optimization
+    g.append(un[0] - uc[0]) # constrain the contigency and nomial as same in first state
     lbg.append(0)
     ubg.append(0)
     
@@ -94,7 +94,11 @@ def solve_Cmpc(x0, y0n, y0c, t):
         y_obs = obs_speed * (t - N_c) + y_obs_0  
     # y_obs_N = min(y_obs_max, obs_speed * (N_obs - t) + y_obs)
     y_obs_N = obs_speed * (N_obs - t) + y_obs
-        
+
+
+    # 根据时间t和障碍物的动态（如果存在），
+    #添加避障约束。如果t大于某个阈值N_c且障碍物存在（obs_pop为真），
+    #则两个系统都需要避免障碍物。否则，只有yc系统需要避障。
     for k in range(N+1):
         if k + t >= N_obs:
 
